@@ -1,11 +1,3 @@
-install.packages("jsonlite")
-install.packages("curl")
-install.packages("plyr")
-install.packages("sqldf")
-
-library("jsonlite")
-library("plyr")
-library('sqldf')
 
 readJson <- function() {
   jsonURL <- "http://data.maryland.gov/api/views/pdvh-tf2u/rows.json?accessType=DOWNLOAD"
@@ -22,6 +14,28 @@ namesOfColumns <-
 names(jsonDf) <- namesOfColumns
 
 jsonDf$DAY_OF_WEEK <- gsub(' ', '', jsonDf$DAY_OF_WEEK)
-sqldf("select count(CASE_NUMBER) from jsonDf where jsonDf.DAY_OF_WEEK = 'SUNDAY'")
-sqldf("select count(CASE_NUMBER) from jsonDf where INJURY = 'YES'")
-sqldf("select count(DAY_")
+accSundaySQL <- sqldf("select count(CASE_NUMBER) from jsonDf where jsonDf.DAY_OF_WEEK = 'SUNDAY'")
+accInjurySQL <- sqldf("select count(CASE_NUMBER) from jsonDf where INJURY = 'YES'")
+
+# Everything above this line was taken from either the book or asynch material
+# Everything below this line is a combination of
+# https://www.r-bloggers.com/ and A LOT of trial-and-error
+
+injuryByDay <- function() {
+  daysInjury <- sqldf("select distinct DAY_OF_WEEK from jsonDf")
+  counts <- c()
+  for (i in 1:length(daysInjury[,1])) {
+    sql <- paste("select count(CASE_NUMBER) as COUNT from jsonDf where DAY_OF_WEEK = '", daysInjury[i,], "'", sep = '')
+    number <- sqldf(sql)[,1]
+    counts <- c(counts, number)
+  }
+  daysInjury['COUNTS'] <- counts
+  return(daysInjury)
+}
+
+daysInjury <- injuryByDay()
+accInjurySQL[1,]
+accSundaySQL[1,]
+
+# Finding the number of accidents on Sunday the easy way
+sum(jsonDf$DAY_OF_WEEK == 'SUNDAY')
