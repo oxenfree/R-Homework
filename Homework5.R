@@ -40,3 +40,7 @@ accSundaySQL[1,]
 # Finding the number of accidents on Sunday the easy way
 sum(jsonDf$DAY_OF_WEEK == 'SUNDAY')
 sum(jsonDf$BARRACK == 'Rockville')
+
+# Finding the number of accidents per day
+tapply(jsonDf$INJURY == 'YES', jsonDf$DAY_OF_WEEK, sum)
+
