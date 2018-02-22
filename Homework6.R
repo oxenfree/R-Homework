@@ -54,6 +54,9 @@ ggplot(airQualityHW6, aes(x = Day, y = value, color = variable)) +
   geom_point(aes(y = Temp, col = "Temp")) +
   facet_grid(. ~ Month)
 
+airq.s <- melt(airQualityHW6)
+airq.s <- ddply(airq.s, .(variable), transform, rescale = scale(value))
+
 # Very cool heatmap functions found here:
 # https://learnr.wordpress.com/2010/01/26/ggplot2-quick-heatmap-plotting/
 ggplot(airq.s, aes(Day, variable)) +
