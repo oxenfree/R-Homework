@@ -1,0 +1,57 @@
+```{r}
+require(RCurl)
+install.packages("gdata")
+require(gdata)  
+```
+
+```{r}
+xl_url <- "http://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/mlr/excel/mlr01.xls"
+ant_df <- read.xls(xl_url)
+```
+
+```{r}
+str(ant_df)
+```
+
+```{r}
+col_names <- c("fawns", "adult", "precipitation", "winter_severity")
+colnames(ant_df)<- col_names
+```
+```{r}
+ant_df[,"fawns"] <- ant_df[, "fawns"] * 100
+ant_df[,"adult"] <- ant_df[, "adult"] * 100
+
+```
+
+```{r}
+ggplot(ant_df, aes(x = precipitation, y = fawns)) +
+  geom_point(color = "blue", alpha = .5) +
+  geom_smooth(method = lm, color = "darkred") +
+  ggtitle("Fawns and Precipitation")
+ggplot(ant_df, aes(x = adult, y = fawns)) +
+  geom_point(color = "red", alpha = .5) +
+  geom_smooth(method = loess, color = "steelblue") +
+  ggtitle("Fawns and Adult Populations")
+ggplot(ant_df, aes(x = winter_severity, y = fawns)) +
+  geom_point(color = "orange", alpha = .5) +
+  geom_smooth(method = lm, color = "green") +
+  ggtitle("Fawns and Winter Severity")
+```
+```{r}
+model1 <- lm(formula = fawns ~ winter_severity, data = ant_df)
+summary(model1)
+```
+```{r}
+model2 <- lm(formula = fawns ~ winter_severity + precipitation, data = ant_df)
+summary(model2)
+```
+```{r}
+model3 <- lm(formula = fawns ~ adult + winter_severity + precipitation, data = ant_df)
+summary(model3)
+```
+
+```{r}
+best_model <- lm(formula = fawns ~ adult + precipitation, data = ant_df)
+summary(best_model)
+```
+
