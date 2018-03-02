@@ -69,7 +69,7 @@ svm_pred <- predict(svm_output, test_data, type = "votes")
 ```
 
 ```{r}
-pred_table <- data.frame(test_data[58,], svm_pred[1,])
+pred_table <- data.frame(airq[58,], svm_pred[1,])
 table(pred_table)
 ```
 

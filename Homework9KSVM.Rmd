@@ -47,11 +47,10 @@ svm_output
 ```{r}
 svm_output <- ksvm(Ozone ~ ., data = train_q, kernel = "rbfdot", kpar = "automatic", C = 500000, cross = 3, prob.model = TRUE)
 svm_output
-hist(alpha(svm_output)[[1]])
 ```
 
 ```{r}
-svm_pred <- predict(svm_output, airq, type = "votes")
+svm_pred <- predict(svm_output, pred_q, type = "votes")
 ```
 
 ```{r}
@@ -72,5 +71,147 @@ max(pred_table$residuals)
 min(pred_table$residuals)
 median(pred_table$residuals)
 plot(pred_table$residuals)
+```
+
+```{r}
+## Root means squared function found here
+## https://heuristically.wordpress.com/2013/07/12/calculate-rmse-and-mae-in-r-and-sas/
+rmse <- function(error) {
+  sqrt(mean(error)^2)
+}
+rmse(pred_table$residuals)
+```
+
+```{r}
+display_df <- data.frame(airq$Temp, airq$Wind, airq$Ozone, pred_table$residuals)
+```
+
+```{r}
+summary(display_df)
+```
+
+```{r}
+library(ggplot2)
+
+```
+
+```{r}
+row_n <- c("temp", "wind", "ozone", "residuals")
+names(display_df) <- row_n
+ggplot(display_df, aes(x=temp, y=wind)) +
+  geom_point(size=display_df$ozone / 10, color = abs(display_df$residuals))
+```
+
+```{r}
+install.packages("e1071")
+library(e1071)
+```
+
+```{r}
+s_out <- svm(airq$Ozone ~ ., data = airq)
+summary(s_out)
+```
+
+```{r}
+attach(airq)
+s_var <- subset(airq, select = -airq$Ozone)
+s_y <- airq$Ozone
+pred_s <- predict(s_out, s_var)
+```
+
+```{r}
+table(pred_s, s_y)
+```
+
+```{r}
+pred_table_sv <- data.frame(airq[,1], pred_s)
+str(pred_table_sv)
+summary(pred_table_sv)
+```
+
+```{r}
+row_n <- c("ozone", "prediction")
+names(pred_table_sv) <- row_n
+```
+
+```{r}
+pred_table_sv$residuals <- (pred_table_sv$ozone - pred_table_sv$prediction)
+```
+
+```{r}
+summary(pred_table_sv)
+```
+
+```{r}
+
+```
+
+```{r}
+rmse(pred_table_sv$residuals)
+rmse(pred_table$residuals)
+```
+
+```{r}
+pred_table_sv <- data.frame(pred_table_sv, airq$Temp, airq$Wind)
+```
+
+```{r}
+
+ggplot(pred_table_sv, aes(x=airq.Temp, y=airq.Wind)) +
+  geom_point(size=Ozone / 10, colour = abs(pred_table_sv$residuals))
+```
+
+```{r}
+olat <- lm(formula = Ozone ~ Temp, data = airq)
+olaw <- lm(formula = Ozone ~ Wind, data = airq)
+summary(olat)
+summary(olaw)
+```
+
+```{r}
+lm_model <- lm(formula = Ozone ~ Temp + Wind, data = airq)
+summary(lm_model)
+```
+
+```{r}
+ggplot(lm_model$model, aes(x=lm_model$model$Temp, y=lm_model$model$Wind)) +
+  geom_point(size=lm_model$model$Ozone / 10, colour = abs(lm_model$residuals))
+```
+
+```{r}
+good_ozone <- as.numeric(airq$Ozone >= mean(airq$Ozone))
+good_ozone
+```
+
+```{r}
+airq$good_ozone <- good_ozone
+```
+
+```{r}
+train_q <- airq[rand_index[1:cut_2_3],]
+pred_q <- airq[rand_index[(cut_2_3 + 1) : dim(airq)[1]], ]
+svm_output <- ksvm(good_ozone ~ ., data = train_q, kernel = "rbfdot", kpar = "automatic", C = 5, cross = 3, prob.model = TRUE)
+svm_output
+```
+
+```{r}
+svm_pred <- predict(svm_output, pred_q, type = "votes")
+pred_table <- data.frame(airq[,7], as.numeric(svm_pred[,1] > 0))
+table(pred_table)
+```
+
+```{r}
+pred_table$residuals <- as.numeric(pred_table$airq...7. == pred_table$as.numeric.svm_pred...1....0.)
+```
+
+```{r}
+display_df <- data.frame(airq$Temp, airq$Wind, airq$Ozone, pred_table$residuals)
+```
+
+```{r}
+row_n <- c("temp", "wind", "ozone", "residuals")
+names(display_df) <- row_n
+ggplot(display_df, aes(x=temp, y=wind)) +
+  geom_point(size=display_df$ozone / 10, color = display_df$residuals + 1)
 ```
 
