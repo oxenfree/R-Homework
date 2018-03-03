@@ -1,0 +1,95 @@
+---
+title: "Classwork Week 10"
+output: html_notebook
+---
+
+```{r}
+vote_speech <- readLines("../vote_speech.txt")
+head(vote_speech)
+```
+```{r}
+words_vec <- VectorSource(vote_speech)
+words_corp <- Corpus(words_vec)
+words_corp
+```
+
+```{r}
+words_corp <- tm_map(words_corp, content_transformer(tolower))
+words_corp <- tm_map(words_corp, removePunctuation)
+words_corp <- tm_map(words_corp, removeNumbers)
+words_corp <- tm_map(words_corp, removeWords, stopwords("english"))
+```
+
+```{r}
+tdm <- TermDocumentMatrix(words_corp)
+tdm
+```
+
+```{r}
+inspect(tdm)
+```
+
+```{r}
+m <- as.matrix(tdm)
+word_count <- rowSums(m)
+word_count <- sort(word_count, decreasing = T)
+head(word_count)
+```
+
+```{r}
+cloud_frame <- data.frame(word = names(word_count), freq = word_count)
+```
+
+```{r}
+wordcloud(cloud_frame$word, cloud_frame$freq)
+```
+
+```{r}
+wordcloud(names(word_count), word_count, min.freq = 2, max.words = 50, colors = brewer.pal(8, "Dark2"))
+```
+
+```{r}
+pos <- readLines("../positive-words.txt")
+neg <- readLines("../negative-words.txt")
+```
+
+```{r}
+pos <- pos[-1:-34]
+neg <- neg[-1:-34]
+```
+
+```{r}
+total_words <- sum(word_count)
+words <- names(word_count)
+```
+
+```{r}
+match_words <- match(words, pos, nomatch = 0)
+match_count <- word_count[which(match_words != 0)]
+length(match_count)
+```
+
+```{r}
+match_pos_words <- names(match_count)
+num_pos <- sum(match_count)
+num_pos
+
+```
+
+```{r}
+match_words <- match(words, neg, nomatch = 0)
+neg_count <- word_count[which(match_words != 0)]
+num_neg <- sum(neg_count)
+match_neg_words <- names(neg_count)
+num_neg
+length(neg_count)
+```
+
+```{r}
+total_words <- length(words)
+pos_ratio <- num_pos / total_words
+neg_ratio <- num_neg / total_words
+pos_ratio
+neg_ratio
+```
+
