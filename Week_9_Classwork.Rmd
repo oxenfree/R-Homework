@@ -1,0 +1,51 @@
+---
+title: "Classwork 9"
+output: html_notebook
+---
+
+
+```{r}
+install.packages("arules")
+library("arules")
+```
+```{r}
+data("Groceries")
+```
+
+```{r}
+summary(Groceries)
+```
+
+```{r}
+itemFrequencyPlot(Groceries, support = .1)
+```
+
+```{r}
+rule_set <- apriori(Groceries, parameter = list(support = .01, confidence = .5))
+```
+
+```{r}
+summary(rule_set)
+```
+
+```{r}
+inspect(rule_set)
+```
+
+```{r}
+install.packages("arulesViz", dependencies = TRUE)
+library("arulesViz")
+```
+
+```{r}
+rule_set <- apriori(Groceries, parameter = list(support = .005, confidence = .35))
+plot(rule_set)
+```
+
+```{r}
+good_rules <- rule_set[quality(rule_set)$lift > 3.5]
+```
+```{r}
+inspect(good_rules)
+```
+

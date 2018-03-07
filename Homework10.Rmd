@@ -1,0 +1,82 @@
+---
+title: "Homework 10"
+output: html_notebook
+---
+```{r}
+afinn <- readLines("../AFINN.txt")
+```
+
+```{r}
+afinn[2477]
+```
+
+```{r}
+split <- strsplit(afinn, "\t")
+```
+
+```{r}
+afinn_words <- sapply(split, function(x) {as.character(x[1])})
+```
+
+```{r}
+afinn_rates <- sapply(split, function(x) {as.numeric(x[2])})
+```
+
+```{r}
+afinn <- data.frame(words = afinn_words, rates = afinn_rates)
+```
+
+```{r}
+rm(split)
+```
+
+```{r}
+matched_words <- match(cloud_frame$word, afinn$words, nomatch = 0)
+```
+
+```{r}
+match_rows <- which(matched_words > 0)
+matched_words <- afinn[match_rows,]
+```
+
+```{r}
+sum(matched_words$rates)
+mean(matched_words$rates)
+median(matched_words$rates)
+```
+
+```{r}
+score_vote_total <- sum(matched_words$rates)
+score_vote_total
+```
+
+```{r}
+afinn_speech_count <- function(speech, vec) {
+  words_vec <- VectorSource(speech[vec])
+  words_corp <- Corpus(words_vec)
+  words_corp <- tm_map(words_corp, content_transformer(tolower))
+  words_corp <- tm_map(words_corp, removePunctuation)
+  words_corp <- tm_map(words_corp, removeNumbers)
+  words_corp <- tm_map(words_corp, removeWords, stopwords("english"))
+  tdm <- TermDocumentMatrix(words_corp)
+  m <- as.matrix(tdm)
+  word_count <- rowSums(m)
+  word_count <- sort(word_count, decreasing = T)
+  cloud_frame <- data.frame(word = names(word_count), freq = word_count)
+  matched_words <- match(cloud_frame$word, afinn$words, nomatch = 0)
+  match_rows <- which(matched_words > 0)
+  matched_words <- afinn[match_rows,]
+  return(sum(matched_words$rates))
+}
+speech_1_q <- afinn_speech_count(vote_speech, 1:3)
+speech_2_q <- afinn_speech_count(vote_speech, 4:7)
+speech_3_q <- afinn_speech_count(vote_speech, 8:12)
+speech_4_q <- afinn_speech_count(vote_speech, 13:15)
+```
+
+```{r}
+plot_vec <- c(speech_1_q, speech_2_q, speech_3_q, speech_4_q)
+barplot(plot_vec, col = "darkred")
+```
+
+

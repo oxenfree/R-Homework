@@ -1,0 +1,13 @@
+library(ggplot2)
+library(maptools)
+library(mapdata)
+library(ggthemes)
+library(tibble)
+library(viridis)
+
+install.packages("zipcode")
+library(zipcode)
+library(dplyr)
+library(data.table)
+install.packages("reshape")
+library(reshape)

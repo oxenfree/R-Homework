@@ -1,0 +1,79 @@
+---
+title: "Classwork 9 Part 2"
+output: html_document
+---
+
+```{r cars}
+install.packages("kernlab")
+```
+
+```{r}
+library(kernlab)
+```
+
+```{r}
+data(spam)
+```
+```{r}
+str(spam)
+```
+
+```{r}
+dim(spam)
+```
+
+```{r}
+table(spam$type)
+```
+
+```{r}
+rand_index <- sample(1:dim(spam)[1])
+```
+
+```{r}
+cut_point_2_3 <- floor(2 * length(rand_index) / 3)
+cut_point_2_3
+```
+
+```{r}
+train_data <- spam[rand_index[1:cut_point_2_3],]
+test_data <- spam[(cut_point_2_3 + 1):length(rand_index),]
+```
+```{r}
+svm_output <- ksvm(type ~ ., data = train_data, kernel = "rbfdot", kpar = "automatic", C = 50, cross = 3, prob.model = TRUE)
+```
+
+```{r}
+svm_output
+```
+
+```{r}
+hist(alpha(svm_output)[[1]])
+```
+
+```{r}
+svm_output <- ksvm(type ~ ., data = train_data, kernel = "rbfdot", kpar = "automatic", C = 50, cross = 3, prob.model = TRUE)
+```
+
+```{r}
+svm_output
+```
+
+```{r}
+hist(alpha(svm_output)[[1]], main = "Support Vector Histogram of C = 50", xlab = "Support Vector Values")
+  
+```
+
+```{r}
+svm_pred <- predict(svm_output, test_data, type = "votes")
+```
+
+```{r}
+pred_table <- data.frame(airq[58,], svm_pred[1,])
+table(pred_table)
+```
+
+```{r}
+str(pred_table)
+```
+

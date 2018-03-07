@@ -2,7 +2,7 @@
 readJson <- function() {
   jsonURL <- "http://data.maryland.gov/api/views/pdvh-tf2u/rows.json?accessType=DOWNLOAD"
   rawJson <- fromJSON(jsonURL, simplifyDataFrame = TRUE)
-  return(as.data.frame(rawJson[["data"]]))
+  return(as.data.frame(rawJson[["data"]], stringsAsFactors = F))
 }
 
 jsonDf <- readJson()
@@ -39,5 +39,8 @@ accSundaySQL[1,]
 
 # Finding the number of accidents on Sunday the easy way
 sum(jsonDf$DAY_OF_WEEK == 'SUNDAY')
+sum(jsonDf$BARRACK == 'Rockville')
+
 # Finding the number of accidents per day
 tapply(jsonDf$INJURY == 'YES', jsonDf$DAY_OF_WEEK, sum)
+
