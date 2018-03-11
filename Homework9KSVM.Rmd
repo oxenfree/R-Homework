@@ -99,7 +99,7 @@ library(ggplot2)
 row_n <- c("temp", "wind", "ozone", "residuals")
 names(display_df) <- row_n
 ggplot(display_df, aes(x=temp, y=wind)) +
-  geom_point(size=display_df$ozone / 10, color = abs(display_df$residuals))
+  geom_point(size=display_df$residuals / 10, color = abs(display_df$residuals))
 ```
 
 ```{r}
